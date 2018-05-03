@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May  2 11:47:38 2018
+
+@author: pdyb
+"""
+
+#%%
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+#定義函數
+def problem(dices,sides,rolls):
+    
+    histogram = np.zeros((dices,sides),dtype = int)
+    dices_sum = [0]*rolls
+    count_sum = []
+
+    for k in range(rolls):
+        for i in range(dices):
+            r = int(np.random.rand()*sides)
+            histogram[i,r] = histogram[i,r] + 1
+            dices_sum[k] = dices_sum[k] + (r+1)
+    print('')
+    print('────────────────────────────────────────────────────────────\nOutput:\nIn the case') 
+    print('dices N1 = {}'.format(dices))
+    print('sides N2 = {}'.format(sides))
+    print('rolls N3 = {}'.format(rolls))
+    print('\n(1)histogram:   [ N1*[N2 elements] ],sum of elements=N3 \n',histogram) 
+    print("\n(2)The sum of values for N1 dices in one roll.\nOne trial has N3 =",rolls,"rolls.:\n",dices_sum)
+    
+    
+#重複畫圖
+    if test == True:
+        for i in range(sides*dices):
+            count_sum.append(dices_sum.count(int("{}".format(i+1))))
+        print("\n(3)Experimental probability distribution:\n",count_sum) 
+        print("(dices N1)*(sides N2)=",dices,"*",sides,"=",format(dices*sides),"(elements for 1 ~",format(dices*sides),")")
+        
+        data = dices_sum              #y軸 累計(2)的[]中相同數字出現次數
+        bins = np.arange(0, 10000, 1) #直方圖 條數可為0~10000條,每條寬度1,計算大數目時，需調整。
+ 
+        plt.xlim([0, sides*dices+2])  #x軸上下限 0~N2*N1+2
+        plt.hist(data, bins=bins,normed=1,facecolor='y', edgecolor='g',alpha=1,histtype='stepfilled')
+        #bins=bins 固定bins, normed=1歸一 ,alpha 深淺色 ,histtype='stepfilled'值方圖型態，改變型態加快繪圖時間       
+        
+        plt.title('Experimental probability distribution')
+        plt.xlabel('Sum of N1 dices')
+        plt.ylabel('Probability')
+ 
+        plt.show()        
+        
+#統計參數
+    mean = 0
+    m2 = 0
+    m3 = 0
+    for i in range(dices):
+        for j in range(sides):
+            mean = (j+1)*histogram[i,j]/rolls/dices + mean
+            m2 = (j+1)**2*histogram[i,j]/rolls/dices + m2
+            m3 = (j+1)**3*histogram[i,j]/rolls/dices + m3
+            variance = m2-mean**2
+            sd = np.sqrt(variance)
+        
+            th_mean = (1+sides)*sides/(2*sides)
+            th_m2 = sides*(sides+1)*(2*sides+1)/(6*sides)
+            th_m3 = ((1+sides)*sides/2)**2/sides
+            th_variance = sides*(sides+1)*(2*sides+1)/(6*sides)-((1+sides)*sides/(2*sides))**2
+            th_sd = np.sqrt(th_variance)
+   
+    print('______________________________________________________________')
+    print('(4)comparisons      theoretical     experimental     error')
+    print('mean               =','{: 10.4f}'.format(th_mean),'{: 15.4f}'.format(mean),'{: 10.2%}'.format(((th_mean)-mean)/(th_mean)))
+    print('2-th moment        =','{: 10.4f}'.format(th_m2),'{: 15.4f}'.format(m2),'{: 10.2%}'.format(((th_m2)-m2)/(th_m2)))
+    print('3-th moment        =','{: 10.4f}'.format(th_m3),'{: 15.4f}'.format(m3),'{: 10.2%}'.format(((th_m3)-m3)/(th_m3)))
+    print('variance           =','{: 10.4f}'.format(th_variance),'{: 15.4f}'.format(variance),'{: 10.2%}'.format(((th_variance)-variance)/(th_variance)))
+    print('standard deviation =','{: 10.4f}'.format(th_sd),'{: 15.4f}'.format(sd),'{: 10.2%}'.format(((th_sd)-sd)/(th_sd)))
+    # n-th moment = the n-th sample raw moment  
+
+#輸入介面 
+test = True #每次都畫圖
+while True:
+    print('O────────────────────────────────────────────────────────────O')    
+    print("Input: problem(N1=dices,N2=sides,N3=rolls)")            
+
+    in_dices = input("There are N1 dices , N1 = ")  #輸入處
+    dices = int(in_dices)             #整數
+    if not in_dices.isdigit():break   #輸入非數字就結束循環
+    
+    in_sides = input("There are N2 sides for each dice , N2 = ")   
+    sides = int(in_sides)
+    if not in_sides.isdigit():break
+    
+    in_rolls = input("One trial has N3 rolls , N3 = ")
+    rolls = int(in_rolls)
+    if not in_rolls.isdigit():break
+
+    problem(dices,sides,rolls)  #開始跑
